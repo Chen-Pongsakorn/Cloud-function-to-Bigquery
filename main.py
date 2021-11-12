@@ -1,6 +1,6 @@
 import base64
-import datetime
 import os
+from datetime import datetime, timedelta
 from bs4 import BeautifulSoup
 import requests
 from google.cloud import bigquery
@@ -22,12 +22,17 @@ def get_data(url):
     rows = []
 
     for d in div:
+        """
+        In this first 3 lines, it will collect the data from website.
+        The rest will change time zone from GMT-5 to GMT +7, set data into string with specific type
+        and add it to the rows
+        """
         header = d.find('a').text
         source = d.find('span',{'class':'source'}).text
         date = d.find('span',{'class':'post-date'}).text
-        rows.append((header, source, date))
-        """ Get all header, source and date from div tag.
-            Then add them into rows for the list of data"""
+        new_datetime = datetime.strptime(date, '%b %d %Y %I:%M%p') + timedelta(hours=12)
+        new_datetime_th = new_datetime.strftime('%Y-%m-%d %H:%M')
+        rows.append((header, source, new_datetime_th))
 
     return rows
 
@@ -40,5 +45,6 @@ def insert_data(event, context):
     table_ref = dataset_ref.table(Config.table_name) 
     table = client.get_table(table_ref)
     result = client.insert_rows(table, record)
+    
     return result
     
