@@ -9,3 +9,6 @@
 3. Add code and requirments.
 4. Deploy Cloud Function.
 5. Set Cloud Scheduler.
+
+# Example data in Bigquery
+![console](img/Example_data.png?raw=true)
